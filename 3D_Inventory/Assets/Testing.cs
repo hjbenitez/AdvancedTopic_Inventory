@@ -7,7 +7,7 @@ public class Testing : MonoBehaviour
     private InteractiveGrid grid;
     private void Start()
     {
-        grid = new InteractiveGrid(4, 2, 10f);
+        grid = new InteractiveGrid(10, 10, 10f, new Vector3(-10, -45));
     }
 
     private void Update()
@@ -17,6 +17,11 @@ public class Testing : MonoBehaviour
             //grid.setValue(GetMouseWorldPosition(), 56);
             grid.setValue(GetMouseWorldPosition(), 56);
 
+        }
+
+        if(Input.GetMouseButtonDown(1))
+        {
+            Debug.Log(grid.getValue(GetMouseWorldPosition()));
         }
     }
 
