@@ -34,7 +34,6 @@ public class InteractiveGrid
             Debug.DrawLine(getWorldPosition(width, 0), getWorldPosition(width, height), Color.red, 100f);
         }
 
-        //setValue(2, 1, 56);
 
     }
 
@@ -86,6 +85,13 @@ public class InteractiveGrid
         return getValue(x, y);
 
     }
+
+    public void CenterCamera()
+    {
+        Camera camera = Camera.main;
+        camera.transform.position = new Vector3((width * cellSize) / 2, (height * cellSize) / 2, camera.transform.position.z) + originPosition;
+    }
+
     public TextMesh CreateWorldText(Transform parent, string text, Vector3 localPosition, int fontSize, Color color, TextAnchor textAnchor)
     {
         GameObject gameObject = new GameObject("World_Text", typeof(TextMesh));

@@ -7,7 +7,8 @@ public class Testing : MonoBehaviour
     private InteractiveGrid grid;
     private void Start()
     {
-        grid = new InteractiveGrid(10, 10, 10f, new Vector3(-10, -45));
+        grid = new InteractiveGrid(5, 5, 10f, new Vector3(-10, -45));
+        grid.CenterCamera();
     }
 
     private void Update()
@@ -34,26 +35,4 @@ public class Testing : MonoBehaviour
         return worldPosition;
         
     }
-
-    /*
-    public Vector3 GetMouseWorldPosition()
-    {
-        Vector3 vec = GetMouseWorldPositionWithZ(Input.mousePosition, Camera.main);
-        vec.z = 0f;
-        return vec;
-    }
-    public Vector3 GetMouseWorldPositionWithZ()
-    {
-        return GetMouseWorldPositionWithZ(Input.mousePosition, Camera.main);
-    }
-    public Vector3 GetMouseWorldPositionWithZ(Camera worldCamera)
-    {
-        return GetMouseWorldPositionWithZ(Input.mousePosition, worldCamera);
-    }
-    public Vector3 GetMouseWorldPositionWithZ(Vector3 screenPosition, Camera worldCamera)
-    {
-        Vector3 worldPosition = worldCamera.ScreenToWorldPoint(screenPosition);
-        return worldPosition;
-    }
-    */
 }
