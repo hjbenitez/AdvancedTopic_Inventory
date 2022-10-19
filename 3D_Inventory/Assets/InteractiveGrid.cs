@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InteractiveGrid 
+public class InteractiveGrid
 {
     private int width;
     private int height;
@@ -36,7 +36,6 @@ public class InteractiveGrid
 
 
     }
-
     private Vector3 getWorldPosition(int x, int y)
     {
         return new Vector3(x, y) * cellSize + originPosition;
