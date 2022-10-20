@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class DragDrop : MonoBehaviour
 {
+    Vector3 lastPosition;
     Vector3 targetPos;
     bool dragging = false;
 
-    public float gridSize = 10f;
+    public float cellSize = 10f;
+    public int height = 5;
+    public int width = 5;
     public Vector3 offset;
 
     // Start is called before the first frame update
     void Start()
     {
         targetPos = transform.position;
-        offset = new Vector3(-5, 0, 0);
+        lastPosition = targetPos;
     }
 
     // Update is called once per frame
@@ -25,6 +28,12 @@ public class DragDrop : MonoBehaviour
             targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), targetPos.z);
             transform.position = targetPos;
         }
+    }
+
+    private void OnMouseDown()
+    {
+        lastPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), targetPos.z);
+        Debug.Log("last " + lastPosition);
     }
 
     private void OnMouseDrag()
@@ -38,20 +47,32 @@ public class DragDrop : MonoBehaviour
     private void OnMouseUp()
     {
         dragging = false;
-        
+        checkBoundaries();
     }
 
     public float RoundToNearestGrid(float pos)
     {
-        float difference = pos % gridSize;
+        float difference = pos % cellSize;
         pos -= difference;
 
-        if(difference > (gridSize/2))
+        if(difference > (cellSize/2))
         {
-            pos += gridSize;
+            pos += cellSize;
         }
 
         return pos;
+    }
+
+    public void checkBoundaries()
+    {
+        float gridWidth = width * cellSize + offset.x;
+        float gridHeight = height * cellSize + offset.y;
+
+        if (transform.position.x >= gridWidth || transform.position.x <= offset.x || transform.position.y >= gridHeight || transform.position.y <= offset.y)
+        {
+            targetPos = lastPosition;
+            Debug.Log("HI");
+        }
     }
 }
 

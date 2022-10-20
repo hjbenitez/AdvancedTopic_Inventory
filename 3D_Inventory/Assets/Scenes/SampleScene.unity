@@ -276,8 +276,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b591a1c1287b94fa3db3290eeeb817, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: 10
-  offset: {x: 0, y: 0, z: 0}
+  cellSize: 10
+  height: 5
+  width: 5
+  offset: {x: 5, y: 5, z: 0}
 --- !u!65 &881744388
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -605,6 +607,14 @@ PrefabInstance:
     - target: {fileID: 3183028517524271697, guid: 8c07114712d7e4845aeb648529cb066f, type: 3}
       propertyPath: gridSize
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3183028517524271697, guid: 8c07114712d7e4845aeb648529cb066f, type: 3}
+      propertyPath: offset.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3183028517524271697, guid: 8c07114712d7e4845aeb648529cb066f, type: 3}
+      propertyPath: offset.y
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3183028517524271697, guid: 8c07114712d7e4845aeb648529cb066f, type: 3}
       propertyPath: inventory
