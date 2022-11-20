@@ -7,8 +7,8 @@ public class Testing : MonoBehaviour
     private InteractiveGrid grid;
     private void Start()
     {
-        grid = new InteractiveGrid(5, 5, 10f, new Vector3(5, 5));
-        grid.CenterCamera();
+        grid = new InteractiveGrid(5, 5, 5, 10f, new Vector3(5, 5));
+        //grid.CenterCamera();
     }
 
     private void Update()

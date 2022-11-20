@@ -11,6 +11,7 @@ public class DragDrop : MonoBehaviour
     public float cellSize = 10f;
     public int height = 5;
     public int width = 5;
+    public int length = 5;
     public Vector3 offset;
 
     // Start is called before the first frame update
@@ -25,14 +26,14 @@ public class DragDrop : MonoBehaviour
     {
         if(!dragging)
         {
-            targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), targetPos.z);
+            targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z) + 5);
             transform.position = targetPos;
         }
     }
 
     private void OnMouseDown()
     {
-        lastPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), targetPos.z);
+        lastPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z) + 5);
         Debug.Log("last " + lastPosition);
     }
 
@@ -67,8 +68,11 @@ public class DragDrop : MonoBehaviour
     {
         float gridWidth = width * cellSize + offset.x;
         float gridHeight = height * cellSize + offset.y;
+        float gridLength = length * cellSize + offset.z;
 
-        if (transform.position.x >= gridWidth || transform.position.x <= offset.x || transform.position.y >= gridHeight || transform.position.y <= offset.y)
+        if (transform.position.x >= gridWidth || transform.position.x <= offset.x || 
+            transform.position.y >= gridHeight || transform.position.y <= offset.y)
+
         {
             targetPos = lastPosition;
             Debug.Log("HI");

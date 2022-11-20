@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CameraRotate : MonoBehaviour
 {
-    Vector3 newPosition;
     bool rotating;
 
     Vector3 backpack = new Vector3(30, 30, 0);
@@ -13,7 +12,7 @@ public class CameraRotate : MonoBehaviour
 
     public float rotationSpeed = 25f;
 
-    float elevationOffset = 0;
+    float elevationOffset = 15;
 
     Vector3 positionOffset;
     public float angle = 0;
@@ -21,7 +20,7 @@ public class CameraRotate : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
@@ -46,9 +45,9 @@ public class CameraRotate : MonoBehaviour
             //float verticalDirection = Input.GetAxis("Mouse Y");
 
             positionOffset.Set(
-                Mathf.Cos(angle) * radius,
+                Mathf.Cos(angle * Mathf.Deg2Rad) * radius,
                 elevationOffset,
-                Mathf.Sin(angle) * radius    
+                Mathf.Sin(angle * Mathf.Deg2Rad) * radius    
             );
 
 
