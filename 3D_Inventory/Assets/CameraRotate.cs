@@ -10,19 +10,23 @@ public class CameraRotate : MonoBehaviour
 
     float radius = -100;
 
-    public float rotationSpeed = 25f;
+    public float sensitivityX;
+    public float sensitivityY = 0.5f;
 
-    float elevationOffset = 40;
+    float elevationOffset = 0;
 
-    Vector3 positionOffset;
-    public float angle = 0;
+    public float angleX = 0;
 
-    
+    Vector3 horizontalPosition;
+
+    float elevationMin;
+    float elevationMax;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        elevationMin = elevationOffset - 30;
+        elevationMax = elevationOffset + 30;
     }
 
     // Update is called once per frame
@@ -37,26 +41,44 @@ public class CameraRotate : MonoBehaviour
         {
             rotating = false;
         }
+
+        if(elevationOffset < elevationMin)
+        {
+            elevationOffset = elevationMin;
+        }
+
+        if (elevationOffset > elevationMax)
+        {
+            elevationOffset = elevationMax;
+        }
     }
 
     private void LateUpdate()
     {
         if (rotating)
         {
+            
             float horizontalDirection = Input.GetAxis("Mouse X");
-            //float verticalDirection = Input.GetAxis("Mouse Y");
+            float verticalDirection = Input.GetAxis("Mouse Y");
 
-            positionOffset.Set(
-                Mathf.Cos(angle * Mathf.Deg2Rad) * radius,
+            angleX += Time.deltaTime * sensitivityX * horizontalDirection;
+
+            horizontalPosition.Set(
+                Mathf.Cos(angleX) * radius,
                 elevationOffset,
-                Mathf.Sin(angle * Mathf.Deg2Rad) * radius    
+                Mathf.Sin(angleX) * radius    
             );
 
+            elevationOffset += (sensitivityY * verticalDirection);
 
-            transform.position = backpack + positionOffset;
-            angle += Time.deltaTime * rotationSpeed * horizontalDirection;
-            transform.LookAt(backpack);
-            
+            transform.position = backpack + horizontalPosition;
+            transform.LookAt(backpack);     
         }
     }
+
+    private void OnDrawGizmos()
+    {
+
+    }
 }
+
