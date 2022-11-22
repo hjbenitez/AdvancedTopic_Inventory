@@ -26,14 +26,14 @@ public class DragDrop : MonoBehaviour
     {
         if(!dragging)
         {
-            targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z) + 5);
+            targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
             transform.position = targetPos;
         }
     }
 
     private void OnMouseDown()
     {
-        lastPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z) + 5);
+        lastPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
         Debug.Log("last " + lastPosition);
     }
 

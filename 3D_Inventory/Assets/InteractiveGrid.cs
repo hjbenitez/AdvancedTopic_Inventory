@@ -18,6 +18,7 @@ public class InteractiveGrid
     {
         this.width = width;
         this.height = height;
+        this.length = length;
         this.cellSize = cellSize;
         this.originPosition = originPosition;
 
@@ -44,7 +45,7 @@ public class InteractiveGrid
 
 
     }
-    private Vector3 getWorldPosition(int x, int y, int z)
+    public Vector3 getWorldPosition(int x, int y, int z)
     {
         return new Vector3(x, y, z) * cellSize + originPosition;
     }
@@ -74,7 +75,7 @@ public class InteractiveGrid
 
     public int getValue(int x, int y, int z)
     {
-        if (x >= 0 && y >= 0 && x < width && y < height)
+        if (x >= 0 && y >= 0 && x < width && y < height && z >= 0 && z <= length)
         {
             return gridArray[x, y, z];
         }
@@ -97,7 +98,17 @@ public class InteractiveGrid
     public void CenterCamera()
     {
         Camera camera = Camera.main;
-        camera.transform.position = new Vector3((width * cellSize) / 2, (height * cellSize) / 2, camera.transform.position.z) + originPosition;
+        camera.transform.position = new Vector3((width * cellSize) / 2, (height * cellSize) / 2, (length * cellSize) / 2) + originPosition;
+    }
+
+    public Vector3 getOrigin()
+    {
+        return originPosition;
+    }
+
+    public Vector3 getSize()
+    {
+        return new Vector3(width, height, length);
     }
 
     public TextMesh CreateWorldText(Transform parent, string text, Vector3 localPosition, int fontSize, Color color, TextAnchor textAnchor)

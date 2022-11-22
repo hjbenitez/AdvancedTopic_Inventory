@@ -6,16 +6,18 @@ public class CameraRotate : MonoBehaviour
 {
     bool rotating;
 
-    Vector3 backpack = new Vector3(30, 30, 0);
+    Vector3 backpack = new Vector3(30, 30, 30);
 
-    float radius = -45.1f;
+    float radius = -100;
 
     public float rotationSpeed = 25f;
 
-    float elevationOffset = 15;
+    float elevationOffset = 40;
 
     Vector3 positionOffset;
     public float angle = 0;
+
+    
 
     // Start is called before the first frame update
     void Start()
