@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class InteractiveGrid
 {
-    private int width;
-    private int height;
-    private int length;
+    int width;
+    int height;
+    int length;
 
-    private float cellSize;
-    private Vector3 originPosition;
+    float cellSize;
+    Vector3 originPosition;
 
-    private int[,,] gridArray;
-    private TextMesh[,,] debugTextArray;
+    int[,,] gridArray;
+    TextMesh[,,] debugTextArray;
 
     public InteractiveGrid(int width, int height, int length, float cellSize, Vector3 originPosition)
     {
@@ -45,7 +45,7 @@ public class InteractiveGrid
 
 
     }
-    public Vector3 getWorldPosition(int x, int y, int z)
+    private Vector3 getWorldPosition(int x, int y, int z)
     {
         return new Vector3(x, y, z) * cellSize + originPosition;
     }

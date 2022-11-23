@@ -2,12 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Testing : MonoBehaviour
+public class GridManager : MonoBehaviour
 {
+    public int width;
+    public int height;
+    public int length;
+
+    public float cellSize;
+    public Vector3 offset;
+
     private InteractiveGrid grid;
     private void Start()
     {
-        grid = new InteractiveGrid(5, 5, 5, 10f, new Vector3(5, 5, 5));
+        grid = new InteractiveGrid(width, height, length, cellSize, offset);
         grid.CenterCamera();
     }
 

@@ -2,23 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DragDrop : MonoBehaviour
+public class DragDrop1x1 : MonoBehaviour
 {
+    public GridManager gridManager;
+
+    float cellSize;
+    int height;
+    int width;
+    int length;
+    Vector3 offset;
+
     Vector3 lastPosition;
     Vector3 targetPos;
     bool dragging = false;
 
-    public float cellSize = 10f;
-    public int height = 5;
-    public int width = 5;
-    public int length = 5;
-    public Vector3 offset;
-
     // Start is called before the first frame update
     void Start()
     {
+        width = gridManager.width;
+        height = gridManager.height;
+        length = gridManager.length;
+        cellSize = gridManager.cellSize;
+        offset = gridManager.offset;
+
         targetPos = transform.position;
         lastPosition = targetPos;
+        
     }
 
     // Update is called once per frame
@@ -71,7 +80,8 @@ public class DragDrop : MonoBehaviour
         float gridLength = length * cellSize + offset.z;
 
         if (transform.position.x >= gridWidth || transform.position.x <= offset.x || 
-            transform.position.y >= gridHeight || transform.position.y <= offset.y)
+            transform.position.y >= gridHeight || transform.position.y <= offset.y ||
+            transform.position.z >= gridLength || transform.position.z <= offset.z)
 
         {
             targetPos = lastPosition;

@@ -5,38 +5,37 @@ using UnityEngine;
 
 public class DrawGrid : MonoBehaviour
 {
-
     public Material material;
 
     public Vector3 origin;
-    Vector3 offset = new Vector3(0, 0, 0);
 
-    Vector3 offsetX = new Vector3(10, 0, 0);
-    Vector3 offsetY = new Vector3(0, 10, 0);
-    Vector3 offsetZ = new Vector3(0, 0, 10);
+    Vector3 offsetX;
+    Vector3 offsetY;
+    Vector3 offsetZ;
 
 
     Vector3[,,] points;
 
-    public Testing test;
-    InteractiveGrid grid;
-
-    public Vector3 gridSize;
+    public GridManager gridManager;
 
     float width;
     float height;
     float length;
 
-    public float cellSize = 10;
+    float cellSize;
 
     // Start is called before the first frame update
     void Start()
     {
-        grid = test.getInteractiveGrid();
+        width = gridManager.width+1;
+        height = gridManager.height+1;
+        length = gridManager.length+1;
+        cellSize = gridManager.cellSize;
 
-        width = gridSize.x;
-        height = gridSize.y;
-        length = gridSize.z;
+        offsetX = new Vector3(cellSize, 0, 0);
+        offsetY = new Vector3(0, cellSize, 0);
+        offsetZ = new Vector3(0, 0, cellSize);
+
 
         points = new Vector3[(int) length, (int) width, (int) height];
         for (int x = 0; x < width; x++)
@@ -50,8 +49,6 @@ public class DrawGrid : MonoBehaviour
             }
             Debug.Log("");
         }
-
-
     }
 
     // Update is called once per frame
@@ -137,10 +134,5 @@ public class DrawGrid : MonoBehaviour
     private Vector3 getWorldPosition(int x, int y, int z)
     {
         return new Vector3(x, y, z) * cellSize + origin;
-    }
-
-    private Vector3 getWorldPosition(Vector3 point)
-    {
-        return point * cellSize + origin;
     }
 }
