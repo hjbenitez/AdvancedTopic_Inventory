@@ -20,17 +20,7 @@ public class GridManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            //grid.setValue(GetMouseWorldPosition(), 56);
-            grid.setValue(GetMouseWorldPosition(), 56);
 
-        }
-
-        if(Input.GetMouseButtonDown(1))
-        {
-            Debug.Log(grid.getValue(GetMouseWorldPosition()));
-        }
     }
 
 

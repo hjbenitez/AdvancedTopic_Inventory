@@ -61,7 +61,7 @@ public class CameraRotate : MonoBehaviour
             float horizontalDirection = Input.GetAxis("Mouse X");
             float verticalDirection = Input.GetAxis("Mouse Y");
 
-            angleX += Time.deltaTime * sensitivityX * horizontalDirection;
+            angleX += Time.deltaTime * sensitivityX * -horizontalDirection;
 
             horizontalPosition.Set(
                 Mathf.Cos(angleX) * radius,
@@ -69,7 +69,7 @@ public class CameraRotate : MonoBehaviour
                 Mathf.Sin(angleX) * radius    
             );
 
-            elevationOffset += (sensitivityY * verticalDirection);
+            elevationOffset += (sensitivityY * -verticalDirection);
 
             transform.position = backpack + horizontalPosition;
             transform.LookAt(backpack);     
