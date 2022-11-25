@@ -5,8 +5,6 @@ using UnityEngine;
 public class DragDrop2x1 : MonoBehaviour
 {
     Vector3[] centers = new Vector3[2];
-    bool[] centersInBounds = new bool[2];
-    bool inBounds = false;
 
     public Vector3 size;
     public GridManager gridManager;
@@ -88,7 +86,7 @@ public class DragDrop2x1 : MonoBehaviour
         float gridHeight = height * cellSize + offset.y;
         float gridLength = length * cellSize + offset.z;
 
-
+        //hardcoded check of the two centers
         if (centers[0].x >= gridWidth || centers[0].x <= offset.x ||
             centers[0].y >= gridHeight || centers[0].y <= offset.y ||
             centers[0].z >= gridLength || centers[0].z <= offset.z ||

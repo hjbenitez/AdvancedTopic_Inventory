@@ -32,6 +32,7 @@ public class DrawGrid : MonoBehaviour
         length = gridManager.length+1;
         cellSize = gridManager.cellSize;
 
+        //used when the grid is close to completion
         offsetX = new Vector3(cellSize, 0, 0);
         offsetY = new Vector3(0, cellSize, 0);
         offsetZ = new Vector3(0, 0, cellSize);
@@ -67,6 +68,7 @@ public class DrawGrid : MonoBehaviour
         material.SetPass(0);
         GL.Color(material.color);
 
+        //draws grid
         for (int x = 0; x < gridPoints.GetLength(0); x++)
         {
             for (int y = 0; y < gridPoints.GetLength(1); y++)
@@ -75,6 +77,7 @@ public class DrawGrid : MonoBehaviour
                 {
                     if (x + 1 < gridPoints.GetLength(0) && y + 1 < gridPoints.GetLength(1) && z + 1 < gridPoints.GetLength(2))
                     {
+                        //draws  a line up, right, and in from the selected point
                         GL.Vertex(gridPoints[x, y, z]);
                         GL.Vertex(gridPoints[x, y, z + 1]);
 
@@ -85,6 +88,7 @@ public class DrawGrid : MonoBehaviour
                         GL.Vertex(gridPoints[x + 1, y, z]);
                     }
 
+                    //for when most of the grid has been drawn 
                     if(x == gridPoints.GetLength(0) - 1 && !(y == gridPoints.GetLength(1) - 1 || z == gridPoints.GetLength(2) - 1))
                     {
                         GL.Vertex(gridPoints[x, y, z]);
