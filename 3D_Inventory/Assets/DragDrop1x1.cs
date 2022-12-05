@@ -19,6 +19,7 @@ public class DragDrop1x1 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //grabs values from the grid created
         width = gridManager.width;
         height = gridManager.height;
         length = gridManager.length;
@@ -33,19 +34,22 @@ public class DragDrop1x1 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!dragging)
+        //enters when the right mouse is not being held down
+        if (!dragging)
         {
             targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
             transform.position = targetPos;
         }
     }
 
+    //updates the last position to the location the item was picked up
     private void OnMouseDown()
     {
         lastPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
         Debug.Log("last " + lastPosition);
     }
 
+    //runs when left-clicked dragging on the object to move it around
     private void OnMouseDrag()
     {
         dragging = true;
@@ -54,12 +58,14 @@ public class DragDrop1x1 : MonoBehaviour
         transform.position = targetPos;
     }
 
+    //checks boundaries when dropped
     private void OnMouseUp()
     {
         dragging = false;
         checkBoundaries();
     }
 
+    //rounds to the nearest grid cell
     public float RoundToNearestGrid(float pos)
     {
         float difference = pos % cellSize;
@@ -73,6 +79,8 @@ public class DragDrop1x1 : MonoBehaviour
         return pos;
     }
 
+    //checks all centers to ensure they are inside the grid
+    //drops it at the last known correct location when dropped out of bounds
     public void checkBoundaries()
     {
         float gridWidth = width * cellSize + offset.x;

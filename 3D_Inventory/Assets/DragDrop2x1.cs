@@ -22,6 +22,7 @@ public class DragDrop2x1 : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //grabs values from the grid created
         width = gridManager.width;
         height = gridManager.height;
         length = gridManager.length;
@@ -35,24 +36,29 @@ public class DragDrop2x1 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //enters when the right mouse is not being held down
         if (!dragging)
         {
             targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
             transform.position = targetPos;
         }
 
+        //updates the centers of the 2x1 block
         centers[0] = transform.position;
         centers[1] = centers[0] + new Vector3(cellSize, 0, 0);
 
+        //Debug - Shows lines from the centers to the origin
         Debug.DrawLine(offset, centers[0], Color.red);
         Debug.DrawLine(offset, centers[1], Color.green);
     }
 
+    //updates the last position to the location the item was picked up
     private void OnMouseDown()
     {
         lastPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
     }
 
+    //runs when left-clicked dragging on the object to move it around
     private void OnMouseDrag()
     {
         dragging = true;
@@ -61,12 +67,14 @@ public class DragDrop2x1 : MonoBehaviour
         transform.position = targetPos;
     }
 
+    //checks boundaries when dropped
     private void OnMouseUp()
     {
         dragging = false;
         checkBoundaries();
     }
 
+    //rounds to the nearest grid cell
     public float RoundToNearestGrid(float pos)
     {
         float difference = pos % cellSize;
@@ -79,7 +87,8 @@ public class DragDrop2x1 : MonoBehaviour
 
         return pos;
     }
-
+    //checks all centers to ensure they are inside the grid
+    //drops it at the last known correct location when dropped out of bounds
     public void checkBoundaries()
     {
         float gridWidth = width * cellSize + offset.x;
