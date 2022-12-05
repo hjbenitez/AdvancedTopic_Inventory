@@ -58,23 +58,29 @@ public class DrawGrid : MonoBehaviour
         
     }
 
+    //built in function - runs after update
     private void OnPostRender()
     {
         RenderLines(points);
     }
+    //draws the grid lines
     void RenderLines(Vector3[,,] gridPoints)
     {
+        //begins the method to draw the lines
         GL.Begin(GL.LINES);
         material.SetPass(0);
         GL.Color(material.color);
 
-        //draws grid
+        //draws the lines on the x axis
         for (int x = 0; x < gridPoints.GetLength(0); x++)
         {
+            //draws the lines on the y axis
             for (int y = 0; y < gridPoints.GetLength(1); y++)
             {
+                //draws the lines on the z axis
                 for(int z = 0; z < gridPoints.GetLength(2); z++)
                 {
+                    //checks to make sure the lines being drawn are NOT the lines at the maximum edges
                     if (x + 1 < gridPoints.GetLength(0) && y + 1 < gridPoints.GetLength(1) && z + 1 < gridPoints.GetLength(2))
                     {
                         //draws  a line up, right, and in from the selected point
@@ -88,7 +94,7 @@ public class DrawGrid : MonoBehaviour
                         GL.Vertex(gridPoints[x + 1, y, z]);
                     }
 
-                    //for when most of the grid has been drawn 
+                    //For when the last few lines need to get drawn (when x, y, or ) are at their maxes
                     if(x == gridPoints.GetLength(0) - 1 && !(y == gridPoints.GetLength(1) - 1 || z == gridPoints.GetLength(2) - 1))
                     {
                         GL.Vertex(gridPoints[x, y, z]);
