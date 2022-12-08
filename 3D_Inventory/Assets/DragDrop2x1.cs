@@ -34,6 +34,7 @@ public class DragDrop2x1 : MonoBehaviour
         targetPos = transform.position;
 
         centers = new Vector3[numberOfCenters];
+        lastPositions = new Vector3[numberOfCenters];
 
         foreach(Transform child in this.gameObject.transform)
         {
@@ -72,6 +73,7 @@ public class DragDrop2x1 : MonoBehaviour
         for(int i = 0; i < centers.Length; i++)
         {
             lastPositions[i] = new Vector3(RoundToNearestGrid(centers[i].x), RoundToNearestGrid(centers[i].y), RoundToNearestGrid(centers[i].z));
+            Debug.Log(lastPositions[i]);
         }
     }
 
@@ -121,7 +123,7 @@ public class DragDrop2x1 : MonoBehaviour
             centers[i].z <= gridLength && centers[i].z >= offset.z &&
             gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == false))
             {
-                targetPos = lastPositions[0];
+                targetPos = lastPositions[lastPositions.Length-1];
             }          
         }
 
