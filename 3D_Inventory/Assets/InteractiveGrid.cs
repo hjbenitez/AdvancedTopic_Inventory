@@ -12,6 +12,7 @@ public class InteractiveGrid
     Vector3 originPosition;
 
     int[,,] gridArray;
+    public bool[,,] inventorySpace;
     TextMesh[,,] debugTextArray;
 
     public InteractiveGrid(int width, int height, int length, float cellSize, Vector3 originPosition)
@@ -23,27 +24,28 @@ public class InteractiveGrid
         this.originPosition = originPosition;
 
         gridArray = new int[width, height, length];
+        inventorySpace = new bool[width, height, length];
         debugTextArray = new TextMesh[width, height, length];
 
+        
         for(int x = 0; x < gridArray.GetLength(0); x++)
         {
             for(int y = 0; y < gridArray.GetLength(1); y++)
             { 
                 for(int z = 0; z < gridArray.GetLength(2); z++)
                 {
-                    //debugTextArray[x, y, z] = CreateWorldText(null, gridArray[x, y, z].ToString(), getWorldPosition(x, y, z) + new Vector3(cellSize, cellSize) * 0.5f, 20, Color.white, TextAnchor.MiddleCenter);
-                    Debug.DrawLine(getWorldPosition(x, y, z), getWorldPosition(x, y + 1, z), Color.red, 100f);
-                    Debug.DrawLine(getWorldPosition(x, y, z), getWorldPosition(x + 1, y, z), Color.red, 100f);
-                    Debug.DrawLine(getWorldPosition(x, y, z), getWorldPosition(x, y, z + 1), Color.red, 100f);
+                    debugTextArray[x, y, z] = CreateWorldText(null, inventorySpace[x, y, z].ToString(), getWorldPosition(x, y, z) + new Vector3(cellSize, cellSize) * 0.5f, 20, Color.blue, TextAnchor.MiddleCenter);
+                    //Debug.DrawLine(getWorldPosition(x, y, z), getWorldPosition(x, y + 1, z), Color.red, 100f);
+                    //Debug.DrawLine(getWorldPosition(x, y, z), getWorldPosition(x + 1, y, z), Color.red, 100f);
+                    //Debug.DrawLine(getWorldPosition(x, y, z), getWorldPosition(x, y, z + 1), Color.red, 100f);
                 }
                 
             }
-            Debug.DrawLine(getWorldPosition(0, height, length), getWorldPosition(width, height, length), Color.red, 100f);
-            Debug.DrawLine(getWorldPosition(width, 0, length), getWorldPosition(width, height, length), Color.red, 100f);
-            Debug.DrawLine(getWorldPosition(width, height, 0), getWorldPosition(width, height, length), Color.red, 100f);
+            //Debug.DrawLine(getWorldPosition(0, height, length), getWorldPosition(width, height, length), Color.red, 100f);
+            //Debug.DrawLine(getWorldPosition(width, 0, length), getWorldPosition(width, height, length), Color.red, 100f);
+            //Debug.DrawLine(getWorldPosition(width, height, 0), getWorldPosition(width, height, length), Color.red, 100f);
         }
-
-
+        
     }
     private Vector3 getWorldPosition(int x, int y, int z)
     {
@@ -63,6 +65,15 @@ public class InteractiveGrid
         {
             gridArray[x, y, z] = value;
             debugTextArray[x, y, z].text = gridArray[x, y, z].ToString();
+        }
+    }
+
+    public void setValue(int x, int y, int z, bool value)
+    {
+        if (x >= 0 && y >= 0 && x < width && y < height)
+        {
+            inventorySpace[x, y, z] = value;
+            debugTextArray[x, y, z].text = inventorySpace[x, y, z].ToString();
         }
     }
 

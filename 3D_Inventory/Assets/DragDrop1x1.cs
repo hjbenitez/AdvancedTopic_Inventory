@@ -12,9 +12,9 @@ public class DragDrop1x1 : MonoBehaviour
     int length;
     Vector3 offset;
 
-    Vector3 lastPosition;
+    public Vector3 lastPosition;
     Vector3 targetPos;
-    bool dragging = false;
+    public bool dragging = false;
 
     // Start is called before the first frame update
     void Start()
@@ -87,9 +87,12 @@ public class DragDrop1x1 : MonoBehaviour
         float gridHeight = height * cellSize + offset.y;
         float gridLength = length * cellSize + offset.z;
 
-        if (transform.position.x >= gridWidth || transform.position.x <= offset.x || 
+        Vector3 index = new Vector3(Mathf.Round(transform.position.x / cellSize - 1), Mathf.Round(transform.position.y / cellSize - 1), Mathf.Round(transform.position.z / cellSize - 1));
+
+        if (transform.position.x >= gridWidth || transform.position.x <= offset.x ||
             transform.position.y >= gridHeight || transform.position.y <= offset.y ||
-            transform.position.z >= gridLength || transform.position.z <= offset.z)
+            transform.position.z >= gridLength || transform.position.z <= offset.z || 
+            gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == true)
 
         {
             targetPos = lastPosition;
