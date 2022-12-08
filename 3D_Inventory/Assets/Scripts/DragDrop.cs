@@ -20,6 +20,7 @@ public class DragDrop : MonoBehaviour
     public Vector3[] lastPositions;
     Vector3 targetPos;
     public bool dragging = false;
+    Vector3 lastRotation;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +36,7 @@ public class DragDrop : MonoBehaviour
 
         centers = new Vector3[numberOfCenters];
         lastPositions = new Vector3[numberOfCenters];
+        lastRotation = transform.eulerAngles;
 
         foreach(Transform child in this.gameObject.transform)
         {
@@ -73,13 +75,33 @@ public class DragDrop : MonoBehaviour
         for(int i = 0; i < centers.Length; i++)
         {
             lastPositions[i] = new Vector3(RoundToNearestGrid(centers[i].x), RoundToNearestGrid(centers[i].y), RoundToNearestGrid(centers[i].z));
-            Debug.Log(lastPositions[i]);
+            lastRotation = transform.eulerAngles;
         }
     }
 
     //runs when left-clicked dragging on the object to move it around
     private void OnMouseDrag()
     {
+        if(Input.GetKeyDown(KeyCode.D))
+        {
+            transform.eulerAngles += new Vector3(0, 90, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            transform.eulerAngles += new Vector3(0, -90, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            transform.localEulerAngles += new Vector3(-90, 0, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            transform.localEulerAngles += new Vector3(90 ,0, 0);
+        }
+
         dragging = true;
         float distanceToScreen = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         targetPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distanceToScreen));
@@ -124,6 +146,7 @@ public class DragDrop : MonoBehaviour
             gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == false))
             {
                 targetPos = lastPositions[lastPositions.Length-1];
+                transform.eulerAngles = lastRotation;
             }          
         }
 
