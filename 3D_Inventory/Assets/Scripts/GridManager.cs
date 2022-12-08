@@ -4,27 +4,23 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
+    [Header("Grid Parameters")]
     public int width;
     public int height;
     public int length;
-
     public float cellSize;
     public Vector3 offset;
 
+    [Space(10)]
+
+    [Header("Inventory Contents")]
     public GameObject[] items;
 
     public bool[,,] inventorySpace;
-    public bool dragging = false;
-
     private InteractiveGrid grid;
-
-
-    TextMesh[,,] debugTextArray;
-
-
+    
     private void Start()
     {
-        debugTextArray = new TextMesh[width, height, length];
         grid = new InteractiveGrid(width, height, length, cellSize, offset);
         inventorySpace = new bool[width, height, length];
         grid.CenterCamera();
@@ -45,7 +41,7 @@ public class GridManager : MonoBehaviour
                     Vector3 spacePos = new Vector3(Mathf.Round((center.x / cellSize) - 1), Mathf.Round((center.y / cellSize) - 1), Mathf.Round((center.z / cellSize) - 1));
 
                     inventorySpace[(int)spacePos.x, (int)spacePos.y, (int)spacePos.z] = true;
-                    grid.setValue((int)spacePos.x, (int)spacePos.y, (int)spacePos.z, true);
+                    //grid.setValue((int)spacePos.x, (int)spacePos.y, (int)spacePos.z, true);
                 }
             }
 
@@ -55,34 +51,9 @@ public class GridManager : MonoBehaviour
                 {
                     Vector3 lp = new Vector3(Mathf.Round((lastPosition.x / cellSize) - 1), Mathf.Round((lastPosition.y / cellSize) - 1), Mathf.Round((lastPosition.z / cellSize) - 1));
                     inventorySpace[(int)lp.x, (int)lp.y, (int)lp.z] = false;
-                    grid.setValue((int)lp.x, (int)lp.y, (int)lp.z, false);
+                    //grid.setValue((int)lp.x, (int)lp.y, (int)lp.z, false);
                 }
             }
-
-
-
-
-
-            /*
-            if (item.GetComponent<DragDrop1x1>().dragging == false)
-            {
-                Vector3 pos = item.transform.position;
-                Vector3 spacePos = new Vector3(Mathf.Round((pos.x / cellSize) - 1), Mathf.Round((pos.y / cellSize) - 1), Mathf.Round((pos.z / cellSize) - 1));
-                inventorySpace[(int)spacePos.x, (int)spacePos.y, (int)spacePos.z] = true;
-
-                grid.setValue((int)spacePos.x, (int)spacePos.y, (int)spacePos.z, true);
-
-                Debug.Log(spacePos);
-                Debug.Log(inventorySpace[0, 0, 0]);
-            }
-
-            if (item.GetComponent<DragDrop1x1>().dragging == true)
-            {
-                Vector3 lp = new Vector3(Mathf.Round((lastPosition.x / cellSize) - 1), Mathf.Round((lastPosition.y / cellSize) - 1), Mathf.Round((lastPosition.z / cellSize) - 1));
-                inventorySpace[(int)lp.x, (int)lp.y, (int)lp.z] = false;
-                grid.setValue((int)lp.x, (int)lp.y, (int)lp.z, false);
-            }
-            */
         }
     }
     public Vector3 GetMouseWorldPosition()
