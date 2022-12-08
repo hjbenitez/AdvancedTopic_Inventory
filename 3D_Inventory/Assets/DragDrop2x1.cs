@@ -116,7 +116,7 @@ public class DragDrop2x1 : MonoBehaviour
 
         for (int i = 0; i < centers.Length; i++)
         {
-            Vector3 index = new Vector3(Mathf.Round(transform.position.x / cellSize - 1), Mathf.Round(transform.position.y / cellSize - 1), Mathf.Round(transform.position.z / cellSize - 1));
+            Vector3 index = new Vector3(Mathf.Round(centers[i].x / cellSize - 1), Mathf.Round(centers[i].y / cellSize - 1), Mathf.Round(centers[i].z / cellSize - 1));
 
             if (!(centers[i].x <= gridWidth && centers[i].x >= offset.x &&
             centers[i].y <= gridHeight && centers[i].y >= offset.y &&
