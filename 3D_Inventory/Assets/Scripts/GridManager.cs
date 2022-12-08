@@ -34,11 +34,11 @@ public class GridManager : MonoBehaviour
     {
         foreach (GameObject item in items)
         {
-            Vector3[] lastPositions = item.GetComponent<DragDrop2x1>().lastPositions;
+            Vector3[] lastPositions = item.GetComponent<DragDrop>().lastPositions;
 
-            if (item.GetComponent<DragDrop2x1>().dragging == false)
+            if (item.GetComponent<DragDrop>().dragging == false)
             {
-                Vector3[] centers = item.GetComponent<DragDrop2x1>().centers;
+                Vector3[] centers = item.GetComponent<DragDrop>().centers;
 
                 foreach(Vector3 center in centers)
                 {
@@ -49,7 +49,7 @@ public class GridManager : MonoBehaviour
                 }
             }
 
-            if (item.GetComponent<DragDrop2x1>().dragging == true)
+            if (item.GetComponent<DragDrop>().dragging == true)
             {
                 foreach(Vector3 lastPosition in lastPositions)
                 {
