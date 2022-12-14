@@ -13,7 +13,8 @@ public class InteractiveGrid
 
     int[,,] gridArray;
     
-    TextMesh[,,] debugTextArray;
+    
+    TextMesh[,,] debugTextArray; //used for debugging | displays true/false text if an item is occupying a space
 
     public bool showText = true;
     public bool[,,] inventorySpace;
@@ -31,6 +32,7 @@ public class InteractiveGrid
         debugTextArray = new TextMesh[width, height, length];
 
 
+        //used to track if a space was registering being taken up by a space
         for (int x = 0; x < gridArray.GetLength(0); x++)
         {
             for (int y = 0; y < gridArray.GetLength(1); y++)
