@@ -17,10 +17,22 @@ public class DragDrop : MonoBehaviour
     int length;
     Vector3 offset;
 
+<<<<<<< Updated upstream
     public Vector3[] lastPositions; //array that stores the last position for each block before moving
     Vector3 targetPos; //the target position of where the item will go when dropped
     public bool dragging = false; //tells the game if the block is dragging or not
     Vector3 lastRotation; //stores the last rotation of the item
+=======
+    float gridWidth;
+    float gridLength;
+    float gridHeight;
+
+    public Vector3[] lastPositions;
+    Vector3 targetPos;
+    public bool dragging = false;
+    Vector3 lastRotation;
+    Vector3 newPosition;
+>>>>>>> Stashed changes
 
     // Start is called before the first frame update
     void Start()
@@ -134,10 +146,16 @@ public class DragDrop : MonoBehaviour
     //drops it at the last known correct location when dropped out of bounds or the space is occupied
     public void checkBoundaries()
     {
+<<<<<<< Updated upstream
         //calulates the max dimensions of the grid
         float gridWidth = width * cellSize + offset.x;
         float gridHeight = height * cellSize + offset.y;
         float gridLength = length * cellSize + offset.z;
+=======
+         gridWidth = width * cellSize + offset.x;
+         gridHeight = height * cellSize + offset.y;
+         gridLength = length * cellSize + offset.z;
+>>>>>>> Stashed changes
 
         //runs for every block inside the item
         for (int i = 0; i < centers.Length; i++)
@@ -155,5 +173,81 @@ public class DragDrop : MonoBehaviour
                 transform.eulerAngles = lastRotation; //sets the last rotation to the current rotation
             }          
         }
+<<<<<<< Updated upstream
+=======
     }
+
+    void gridEdgeSnapping()
+    {
+        /*
+          * PSEUDOCODE for Grid Edge Snapping
+          * 1. Get the objects position as the player moves the object
+          * 2. Once object is dropped, check if the object was dropped out of bounds
+          *3. If no, drop the object where the mouse is 
+          *4. If yes, check which part of the object is out of bounds
+          *        4.1 Once the problem edges are found, find the centers closest to those edges
+          *        4.2 Find new position so those centers line up with the edges of the grid and is inside 
+          *        4.3 If this position is currently occupied by another object, snap to the position it was picked up from
+          *        4.4 If not currently occupied, drop the object in the new position  
+          */
+    }
+
+    Vector3 maxLocationValue(Vector3 mousePos)
+    {
+        float newX = mousePos.x;
+        float newY = mousePos.y;
+        float newZ = mousePos.z;
+
+        //Checks X boundaries
+        if (mousePos.x >= gridWidth)
+        {
+            newX = RoundToNearestGrid(gridWidth);
+        }
+
+        else if (mousePos.x <= offset.x)
+        {
+            newX = RoundToNearestGrid(offset.x);
+        }
+
+        else
+        {
+            newX = RoundToNearestGrid(mousePos.x);
+        }
+
+        //Checks Y boundaries 
+        if(mousePos.y >= gridHeight)
+        {
+            newY = RoundToNearestGrid(gridWidth);
+        }
+
+        else if (mousePos.y <= offset.y) 
+        {
+            newY = RoundToNearestGrid(offset.y);
+        }
+
+        else
+        {
+            newY = RoundToNearestGrid(mousePos.y);
+        }
+
+        //Checks Z boundaries
+        if(mousePos.z >= gridLength)
+        {
+            newZ = RoundToNearestGrid(gridLength);
+        }
+
+        else if(mousePos.z <= offset.z)
+        {
+            newZ = RoundToNearestGrid(offset.z);
+        }
+
+        else
+        {
+            newZ = RoundToNearestGrid(mousePos.z);
+        }
+            return new Vector3(newX, newY, newZ);
+
+>>>>>>> Stashed changes
+    }
+
 }
