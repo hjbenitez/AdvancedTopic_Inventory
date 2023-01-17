@@ -57,14 +57,6 @@ public class DragDrop : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //checks if the item is not being moved
-        if (!dragging)
-        {
-            //continiually updates the target position to the current position
-            //targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
-            //transform.position = targetPos;
-        }
-
         //updates all the centers of the item
         for (int i = 0; i < centers.Length; i++)
         {
@@ -126,8 +118,7 @@ public class DragDrop : MonoBehaviour
     private void OnMouseUp()
     {
         dragging = false;
-        gridEdgeSnapping();
-        //checkBoundaries();
+        transform.position = checkBoundaries2();
     }
 
     //rounds to the nearest grid cell
@@ -146,8 +137,10 @@ public class DragDrop : MonoBehaviour
 
     //checks all centers to ensure they are inside the grid also checks if the space is currently occupied
     //drops it at the last known correct location when dropped out of bounds or the space is occupied
-    public void checkBoundaries()
+    public Vector3 checkBoundaries()
     {
+        Vector3 newPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
+
         //runs for every block inside the item
         for (int i = 0; i < centers.Length; i++)
         {
@@ -160,13 +153,101 @@ public class DragDrop : MonoBehaviour
             centers[i].z <= gridLength && centers[i].z >= offset.z &&
             gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == false))
             {
-                targetPos = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
-                transform.eulerAngles = lastRotation; //sets the last rotation to the current rotation
-            }
+                Debug.Log(furthestCenterMax(0).name + " " + furthestCenterMax(1).name + " " + furthestCenterMax(2).name);
+                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
+            }    
         }
+        return newPosition;
     }
 
-    void gridEdgeSnapping()
+    public Vector3 checkBoundaries2()
+    {
+        Vector3 maxBounds = new Vector3(0, 0, 0);
+        Vector3 minBounds = new Vector3(0, 0, 0);
+
+        bool outOfBounds = false;
+        Vector3 newPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
+
+        //runs for every block inside the item
+        for (int i = 0; i < centers.Length; i++)
+        {
+            //gets the index of where the item is inside the grid
+            Vector3 index = new Vector3(Mathf.Round(centers[i].x / cellSize - 1), Mathf.Round(centers[i].y / cellSize - 1), Mathf.Round(centers[i].z / cellSize - 1));
+
+            //checks if the item is inbounds AND if the space is free using the index (returns the inverse of this due to the ! at the beginning)
+            if (!(centers[i].x <= gridWidth && centers[i].x >= offset.x &&
+            centers[i].y <= gridHeight && centers[i].y >= offset.y &&
+            centers[i].z <= gridLength && centers[i].z >= offset.z))
+            {
+                //Check which side the object was dropped out of bounds
+                if(centers[i].x > gridWidth)
+                {
+                    maxBounds.x = 1;
+                }
+
+                else if (centers[i].y > gridHeight)
+                {
+                    maxBounds.y = 1;
+                }
+
+                if (centers[i].y < offset.y)
+                {
+                    minBounds.y = 1;
+                }
+
+                else if (centers[i].z > gridLength)
+                {
+                    maxBounds.z = 1;
+                }
+
+                if (centers[i].z < offset.z)
+                {
+                    minBounds.z = 1;
+                }
+
+                else if (centers[i].x < offset.x)
+                {
+                    minBounds.x = 1;
+                }
+
+                //Debug.Log(furthestCenterMax(0).name + " " + furthestCenterMax(1).name + " " + furthestCenterMax(2).name);
+                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
+                outOfBounds = true;
+            }
+
+            else if(gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == true)
+            {
+                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
+            }
+        }
+
+        if(outOfBounds)
+        {
+            Debug.Log(maxBounds.x + " " + maxBounds.y + " " + maxBounds.z);
+            Debug.Log(minBounds.x + " " + minBounds.y + " " + minBounds.z);
+
+            float x = 0;
+
+            if(maxBounds.x == 1)
+            {
+                x = RoundToNearestGrid(furthestCenterMax(0).transform.position.x);
+                Debug.Log(x);
+            }
+
+            else if(minBounds.x == 1)
+            {
+                x = RoundToNearestGrid(furthestCenterMin(0).transform.position.x);
+                Debug.Log(x);
+            }
+
+            float newX = offset.x - x;
+
+        }
+
+        return newPosition;
+    }
+
+    Vector3 gridEdgeSnapping()
     {
         /*
           * PSEUDOCODE for Grid Edge Snapping
@@ -176,7 +257,7 @@ public class DragDrop : MonoBehaviour
           *        3.1 if no, drop the object here
           *        3.2 if yes, snap to the origial location
           * 4. If yes, check which part of the object is out of bounds
-          *        4.1 Once the problem edges are found, find the centers closest to those edges
+          *        4.1 Once the problem edges are found, find the centers furthest from those edges
           *        4.2 Find new position so those centers line up with the edges of the grid and is inside
           *        4.3 Check if the space is occupied
           *        4.4 If this position is currently occupied by another object, snap to the position it was picked up from
@@ -186,91 +267,112 @@ public class DragDrop : MonoBehaviour
         //1
         Vector3 newPosition = targetPos;
 
-
         //2
-        for (int i = 0; i < centers.Length; i++)
-        {
-            //checks if the item is inbounds AND if the space is free using the index (returns the inverse of this due to the ! at the beginning)
-            if (centers[i].x <= gridWidth && centers[i].x >= offset.x &&
-            centers[i].y <= gridHeight && centers[i].y >= offset.y &&
-            centers[i].z <= gridLength && centers[i].z >= offset.z)
-            {
-                //gets the index of where the item is inside the grid
-                Vector3 index = new Vector3(Mathf.Round(centers[i].x / cellSize - 1), Mathf.Round(centers[i].y / cellSize - 1), Mathf.Round(centers[i].z / cellSize - 1));
-                if (gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == false)
-                {
-                    targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
-                    transform.position = targetPos;
-                }
 
-                else
-                {
-                    transform.position = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
-                    transform.eulerAngles = lastRotation; //sets the last rotation to the current rotation
-                }
-            }
 
-            else
-            {
-                transform.position = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
-                transform.eulerAngles = lastRotation; //sets the last rotation to the current rotation
-            }
-        }
+
+        return newPosition;
     }
 
-    Vector3 maxLocationValue(Vector3 mousePos)
+    float maxLocationValue(float value, float min, float max)
     {
-        float newX = mousePos.x;
-        float newY = mousePos.y;
-        float newZ = mousePos.z;
+        float newValue;
 
         //Checks X boundaries
-        if (mousePos.x >= gridWidth)
+        if (value >= max)
         {
-            newX = RoundToNearestGrid(gridWidth);
+            newValue = RoundToNearestGrid(gridWidth);
         }
 
-        else if (mousePos.x <= offset.x)
+        else if (value <= min)
         {
-            newX = RoundToNearestGrid(offset.x);
-        }
-
-        else
-        {
-            newX = RoundToNearestGrid(mousePos.x);
-        }
-
-        //Checks Y boundaries 
-        if (mousePos.y >= gridHeight)
-        {
-            newY = RoundToNearestGrid(gridWidth);
-        }
-
-        else if (mousePos.y <= offset.y)
-        {
-            newY = RoundToNearestGrid(offset.y);
+            newValue = RoundToNearestGrid(offset.x);
         }
 
         else
         {
-            newY = RoundToNearestGrid(mousePos.y);
+            newValue = RoundToNearestGrid(value);
         }
 
-        //Checks Z boundaries
-        if (mousePos.z >= gridLength)
+        return newValue;
+    }
+
+    GameObject furthestCenterMax(int axis)
+    {
+        Transform furthest = null;
+
+        for(int i = 0; i < blocks.Count; i++) 
         {
-            newZ = RoundToNearestGrid(gridLength);
+            if(i == 0)
+            {
+                furthest = blocks[i];
+            }
+
+            else if(axis == 0)
+            {
+                if (furthest.position.x < blocks[i].position.x)
+                {
+                    furthest = blocks[i];
+                }
+            }
+
+            else if (axis == 1)
+            {
+                if (furthest.position.y < blocks[i].position.y)
+                {
+                    furthest = blocks[i];
+                }
+            }
+
+            else if(axis == 2)
+            {
+                if (furthest.position.z < blocks[i].position.z)
+                {
+                    furthest = blocks[i];
+                }
+            }
+            
         }
 
-        else if (mousePos.z <= offset.z)
+        return furthest.gameObject;
+    }
+
+    GameObject furthestCenterMin(float axis)
+    {
+        Transform furthest = null;
+
+        for (int i = 0; i < blocks.Count; i++)
         {
-            newZ = RoundToNearestGrid(offset.z);
+            if (i == 0)
+            {
+                furthest = blocks[i];
+            }
+
+            else if (axis == 0)
+            {
+                if (furthest.position.x > blocks[i].position.x)
+                {
+                    furthest = blocks[i];
+                }
+            }
+
+            else if (axis == 1)
+            {
+                if (furthest.position.y > blocks[i].position.y)
+                {
+                    furthest = blocks[i];
+                }
+            }
+
+            else if (axis == 2)
+            {
+                if (furthest.position.z > blocks[i].position.z)
+                {
+                    furthest = blocks[i];
+                }
+            }
         }
 
-        else
-        {
-            newZ = RoundToNearestGrid(mousePos.z);
-        }
-        return new Vector3(newX, newY, newZ);
+        return furthest.gameObject;
     }
 }
