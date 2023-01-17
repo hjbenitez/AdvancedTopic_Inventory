@@ -17,22 +17,15 @@ public class DragDrop : MonoBehaviour
     int length;
     Vector3 offset;
 
-<<<<<<< Updated upstream
+
     public Vector3[] lastPositions; //array that stores the last position for each block before moving
     Vector3 targetPos; //the target position of where the item will go when dropped
     public bool dragging = false; //tells the game if the block is dragging or not
     Vector3 lastRotation; //stores the last rotation of the item
-=======
+
     float gridWidth;
     float gridLength;
     float gridHeight;
-
-    public Vector3[] lastPositions;
-    Vector3 targetPos;
-    public bool dragging = false;
-    Vector3 lastRotation;
-    Vector3 newPosition;
->>>>>>> Stashed changes
 
     // Start is called before the first frame update
     void Start()
@@ -50,8 +43,12 @@ public class DragDrop : MonoBehaviour
         lastPositions = new Vector3[numberOfCenters]; //creates an array that is the length of the number of blocks inside the item, stores the last positions
         lastRotation = transform.eulerAngles; //sets the last rotation of the item to its current rotation
 
+        gridWidth = width * cellSize + offset.x;
+        gridHeight = height * cellSize + offset.y;
+        gridLength = length * cellSize + offset.z;
+
         //for each block that is inside the item, add it to the list of blocks
-        foreach(Transform child in this.gameObject.transform)
+        foreach (Transform child in this.gameObject.transform)
         {
             blocks.Add(child);
         }
@@ -64,8 +61,8 @@ public class DragDrop : MonoBehaviour
         if (!dragging)
         {
             //continiually updates the target position to the current position
-            targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
-            transform.position = targetPos;
+            //targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
+            //transform.position = targetPos;
         }
 
         //updates all the centers of the item
@@ -80,7 +77,7 @@ public class DragDrop : MonoBehaviour
     //updates the last position to the location the item was picked up AND the last rotation of the item
     private void OnMouseDown()
     {
-        for(int i = 0; i < centers.Length; i++)
+        for (int i = 0; i < centers.Length; i++)
         {
             lastPositions[i] = new Vector3(RoundToNearestGrid(centers[i].x), RoundToNearestGrid(centers[i].y), RoundToNearestGrid(centers[i].z));
             lastRotation = transform.eulerAngles;
@@ -93,7 +90,9 @@ public class DragDrop : MonoBehaviour
         //rotates the item when a specific key is pressed
         //WS - UP/DOWN
         //AD - RIGHT/LEFT
-        if(Input.GetKeyDown(KeyCode.D))
+
+        /*
+        if (Input.GetKeyDown(KeyCode.D))
         {
             transform.eulerAngles += new Vector3(0, 90, 0);
         }
@@ -102,7 +101,8 @@ public class DragDrop : MonoBehaviour
         {
             transform.eulerAngles += new Vector3(0, -90, 0);
         }
-
+        
+         * 
         if (Input.GetKeyDown(KeyCode.W))
         {
             transform.localEulerAngles += new Vector3(-90, 0, 0);
@@ -110,8 +110,9 @@ public class DragDrop : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            transform.localEulerAngles += new Vector3(90 ,0, 0);
+            transform.localEulerAngles += new Vector3(90, 0, 0);
         }
+        */
 
         dragging = true;
 
@@ -125,7 +126,8 @@ public class DragDrop : MonoBehaviour
     private void OnMouseUp()
     {
         dragging = false;
-        checkBoundaries();
+        gridEdgeSnapping();
+        //checkBoundaries();
     }
 
     //rounds to the nearest grid cell
@@ -146,17 +148,6 @@ public class DragDrop : MonoBehaviour
     //drops it at the last known correct location when dropped out of bounds or the space is occupied
     public void checkBoundaries()
     {
-<<<<<<< Updated upstream
-        //calulates the max dimensions of the grid
-        float gridWidth = width * cellSize + offset.x;
-        float gridHeight = height * cellSize + offset.y;
-        float gridLength = length * cellSize + offset.z;
-=======
-         gridWidth = width * cellSize + offset.x;
-         gridHeight = height * cellSize + offset.y;
-         gridLength = length * cellSize + offset.z;
->>>>>>> Stashed changes
-
         //runs for every block inside the item
         for (int i = 0; i < centers.Length; i++)
         {
@@ -169,12 +160,10 @@ public class DragDrop : MonoBehaviour
             centers[i].z <= gridLength && centers[i].z >= offset.z &&
             gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == false))
             {
-                targetPos = lastPositions[lastPositions.Length-1]; //sets the position to the last position
+                targetPos = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
                 transform.eulerAngles = lastRotation; //sets the last rotation to the current rotation
-            }          
+            }
         }
-<<<<<<< Updated upstream
-=======
     }
 
     void gridEdgeSnapping()
@@ -182,14 +171,51 @@ public class DragDrop : MonoBehaviour
         /*
           * PSEUDOCODE for Grid Edge Snapping
           * 1. Get the objects position as the player moves the object
-          * 2. Once object is dropped, check if the object was dropped out of bounds
-          *3. If no, drop the object where the mouse is 
-          *4. If yes, check which part of the object is out of bounds
+          * 2. Once dragging stops, check if the object was dropped out of bounds
+          * 3. If no, check if the space is occupied
+          *        3.1 if no, drop the object here
+          *        3.2 if yes, snap to the origial location
+          * 4. If yes, check which part of the object is out of bounds
           *        4.1 Once the problem edges are found, find the centers closest to those edges
-          *        4.2 Find new position so those centers line up with the edges of the grid and is inside 
-          *        4.3 If this position is currently occupied by another object, snap to the position it was picked up from
-          *        4.4 If not currently occupied, drop the object in the new position  
+          *        4.2 Find new position so those centers line up with the edges of the grid and is inside
+          *        4.3 Check if the space is occupied
+          *        4.4 If this position is currently occupied by another object, snap to the position it was picked up from
+          *        4.5 If not currently occupied, drop the object in the new position  
           */
+
+        //1
+        Vector3 newPosition = targetPos;
+
+
+        //2
+        for (int i = 0; i < centers.Length; i++)
+        {
+            //checks if the item is inbounds AND if the space is free using the index (returns the inverse of this due to the ! at the beginning)
+            if (centers[i].x <= gridWidth && centers[i].x >= offset.x &&
+            centers[i].y <= gridHeight && centers[i].y >= offset.y &&
+            centers[i].z <= gridLength && centers[i].z >= offset.z)
+            {
+                //gets the index of where the item is inside the grid
+                Vector3 index = new Vector3(Mathf.Round(centers[i].x / cellSize - 1), Mathf.Round(centers[i].y / cellSize - 1), Mathf.Round(centers[i].z / cellSize - 1));
+                if (gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == false)
+                {
+                    targetPos = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
+                    transform.position = targetPos;
+                }
+
+                else
+                {
+                    transform.position = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
+                    transform.eulerAngles = lastRotation; //sets the last rotation to the current rotation
+                }
+            }
+
+            else
+            {
+                transform.position = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
+                transform.eulerAngles = lastRotation; //sets the last rotation to the current rotation
+            }
+        }
     }
 
     Vector3 maxLocationValue(Vector3 mousePos)
@@ -215,12 +241,12 @@ public class DragDrop : MonoBehaviour
         }
 
         //Checks Y boundaries 
-        if(mousePos.y >= gridHeight)
+        if (mousePos.y >= gridHeight)
         {
             newY = RoundToNearestGrid(gridWidth);
         }
 
-        else if (mousePos.y <= offset.y) 
+        else if (mousePos.y <= offset.y)
         {
             newY = RoundToNearestGrid(offset.y);
         }
@@ -231,12 +257,12 @@ public class DragDrop : MonoBehaviour
         }
 
         //Checks Z boundaries
-        if(mousePos.z >= gridLength)
+        if (mousePos.z >= gridLength)
         {
             newZ = RoundToNearestGrid(gridLength);
         }
 
-        else if(mousePos.z <= offset.z)
+        else if (mousePos.z <= offset.z)
         {
             newZ = RoundToNearestGrid(offset.z);
         }
@@ -245,9 +271,6 @@ public class DragDrop : MonoBehaviour
         {
             newZ = RoundToNearestGrid(mousePos.z);
         }
-            return new Vector3(newX, newY, newZ);
-
->>>>>>> Stashed changes
+        return new Vector3(newX, newY, newZ);
     }
-
 }
