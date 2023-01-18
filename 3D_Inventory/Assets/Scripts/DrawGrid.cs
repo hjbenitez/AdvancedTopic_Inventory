@@ -48,7 +48,6 @@ public class DrawGrid : MonoBehaviour
                     points[x, y, z] = getWorldPosition(x, y, z);
                 }   
             }
-            Debug.Log("");
         }
     }
 

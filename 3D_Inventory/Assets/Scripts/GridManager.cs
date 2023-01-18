@@ -20,7 +20,8 @@ public class GridManager : MonoBehaviour
 
     public bool[,,] inventorySpace; // an array the same size as the grid that tracks if a space is occupied or not
     private InteractiveGrid grid; //the grid building system
-    
+    public bool spaceOccupied = false;
+
     private void Start()
     {
         grid = new InteractiveGrid(width, height, length, cellSize, offset); //creates the grid 
@@ -37,7 +38,7 @@ public class GridManager : MonoBehaviour
             Vector3[] lastPositions = item.GetComponent<DragDrop>().lastPositions; 
 
             //checks to see if the item is not moving
-            if (item.GetComponent<DragDrop>().dragging == false)
+            if (!item.GetComponent<DragDrop>().dragging)
             {
                 //gets the centers of the item 
                 Vector3[] centers = item.GetComponent<DragDrop>().centers;
@@ -54,6 +55,7 @@ public class GridManager : MonoBehaviour
                     //DEBUG --- Visual Aid
                     //grid.setValue((int)spacePos.x, (int)spacePos.y, (int)spacePos.z, true);
                 }
+                spaceOccupied = true;
             }
 
             //checks if the item is moving

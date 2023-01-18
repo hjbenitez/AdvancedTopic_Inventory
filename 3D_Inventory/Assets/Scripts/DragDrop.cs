@@ -69,6 +69,7 @@ public class DragDrop : MonoBehaviour
     //updates the last position to the location the item was picked up AND the last rotation of the item
     private void OnMouseDown()
     {
+        //loops for e
         for (int i = 0; i < centers.Length; i++)
         {
             lastPositions[i] = new Vector3(RoundToNearestGrid(centers[i].x), RoundToNearestGrid(centers[i].y), RoundToNearestGrid(centers[i].z));
@@ -118,7 +119,7 @@ public class DragDrop : MonoBehaviour
     private void OnMouseUp()
     {
         dragging = false;
-        transform.position = checkBoundaries2();
+        transform.position = checkBoundaries();
     }
 
     //rounds to the nearest grid cell
@@ -136,10 +137,17 @@ public class DragDrop : MonoBehaviour
     }
 
     //checks all centers to ensure they are inside the grid also checks if the space is currently occupied
-    //drops it at the last known correct location when dropped out of bounds or the space is occupied
+    //Snaps it to the closet grid edge when dropped out of bounds
+    //drops it at the location it was moved from when the space is occupied
     public Vector3 checkBoundaries()
     {
-        Vector3 newPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
+        //used if the item is dropped out of bound 
+        //1 in the x, y, or z position means it was dropped out of bounds along that axis
+        Vector3 maxBounds = new Vector3(0, 0, 0); //the far edges
+        Vector3 minBounds = new Vector3(0, 0, 0); //the close edges
+
+        bool outOfBounds = false; //tracks if the item was dropped out of bounds
+        Vector3 newPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z)); //the position the item was dropped at 
 
         //runs for every block inside the item
         for (int i = 0; i < centers.Length; i++)
@@ -147,170 +155,149 @@ public class DragDrop : MonoBehaviour
             //gets the index of where the item is inside the grid
             Vector3 index = new Vector3(Mathf.Round(centers[i].x / cellSize - 1), Mathf.Round(centers[i].y / cellSize - 1), Mathf.Round(centers[i].z / cellSize - 1));
 
-            //checks if the item is inbounds AND if the space is free using the index (returns the inverse of this due to the ! at the beginning)
-            if (!(centers[i].x <= gridWidth && centers[i].x >= offset.x &&
-            centers[i].y <= gridHeight && centers[i].y >= offset.y &&
-            centers[i].z <= gridLength && centers[i].z >= offset.z &&
-            gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == false))
-            {
-                Debug.Log(furthestCenterMax(0).name + " " + furthestCenterMax(1).name + " " + furthestCenterMax(2).name);
-                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
-            }    
-        }
-        return newPosition;
-    }
-
-    public Vector3 checkBoundaries2()
-    {
-        Vector3 maxBounds = new Vector3(0, 0, 0);
-        Vector3 minBounds = new Vector3(0, 0, 0);
-
-        bool outOfBounds = false;
-        Vector3 newPosition = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
-
-        //runs for every block inside the item
-        for (int i = 0; i < centers.Length; i++)
-        {
-            //gets the index of where the item is inside the grid
-            Vector3 index = new Vector3(Mathf.Round(centers[i].x / cellSize - 1), Mathf.Round(centers[i].y / cellSize - 1), Mathf.Round(centers[i].z / cellSize - 1));
-
-            //checks if the item is inbounds AND if the space is free using the index (returns the inverse of this due to the ! at the beginning)
+            //checks if the item was dropped out of bounds
             if (!(centers[i].x <= gridWidth && centers[i].x >= offset.x &&
             centers[i].y <= gridHeight && centers[i].y >= offset.y &&
             centers[i].z <= gridLength && centers[i].z >= offset.z))
             {
                 //Check which side the object was dropped out of bounds
+                //checks the far x bounds
                 if(centers[i].x > gridWidth)
                 {
                     maxBounds.x = 1;
                 }
 
-                else if (centers[i].y > gridHeight)
-                {
-                    maxBounds.y = 1;
-                }
-
-                if (centers[i].y < offset.y)
-                {
-                    minBounds.y = 1;
-                }
-
-                else if (centers[i].z > gridLength)
-                {
-                    maxBounds.z = 1;
-                }
-
-                if (centers[i].z < offset.z)
-                {
-                    minBounds.z = 1;
-                }
-
+                //checks the close x bounds
                 else if (centers[i].x < offset.x)
                 {
                     minBounds.x = 1;
                 }
 
-                //Debug.Log(furthestCenterMax(0).name + " " + furthestCenterMax(1).name + " " + furthestCenterMax(2).name);
-                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
-                outOfBounds = true;
-            }
+                //checks the far y bounds
+                if (centers[i].y > gridHeight)
+                {
+                    maxBounds.y = 1;
+                }
 
-            else if(gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == true)
+                //checks the close y bounds
+                else if (centers[i].y < offset.y)
+                {
+                    minBounds.y = 1;
+                }
+
+                //checks the far z bounds
+                if (centers[i].z > gridLength)
+                {
+                    maxBounds.z = 1;
+                }
+
+                //checks the close z bounds
+                else if (centers[i].z < offset.z)
+                {
+                    minBounds.z = 1;
+                }
+
+                outOfBounds = true; //the item was dropped out of bounds
+            }
+            
+            //checks if it was dropped overlapping another item
+            else if(gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == true && !outOfBounds)
             {
-                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the last position
+                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the position it was moved from
             }
         }
 
-        float x = newPosition.x;
-
+        //when the item is dropped out of bounds
         if (outOfBounds)
         {
-            Debug.Log(maxBounds.x + " " + maxBounds.y + " " + maxBounds.z);
-            Debug.Log(minBounds.x + " " + minBounds.y + " " + minBounds.z);           
-
-            if(maxBounds.x == 1)
+            //snaps the x position along the far edge of the grid
+            if (maxBounds.x == 1)
             {
                 GameObject tempMax = furthestCenterMax(0);
-                float tempX1 = RoundToNearestGrid(newPosition.x) - RoundToNearestGrid(tempMax.transform.position.x);
-                x = gridWidth - RoundToNearestGrid(newPosition.x) + RoundToNearestGrid(tempMax.transform.position.x) - 5;
-                Debug.Log(x);
+                float distanceToPivot = RoundToNearestGrid(tempMax.transform.position.x) - RoundToNearestGrid(newPosition.x);
+                newPosition.x = gridWidth - distanceToPivot - 5;
 
             }
 
-            else if(minBounds.x == 1)
+            //snaps the x position along the close edge of the grid
+            else if (minBounds.x == 1)
             {
                 GameObject tempMin = furthestCenterMin(0);
-                float tempX1 = RoundToNearestGrid(tempMin.transform.position.x);
-                float tempX2 = RoundToNearestGrid(newPosition.x);
-                x = offset.x + 5; 
-                Debug.Log(x);
+                float distanceToPivot = RoundToNearestGrid(newPosition.x) - RoundToNearestGrid(tempMin.transform.position.x);
+                newPosition.x = offset.x + distanceToPivot + 5;
+            }
+
+            //snaps the y position along the far edge of the grid
+            if (maxBounds.y == 1)
+            {
+                GameObject tempMax = furthestCenterMax(1);
+                float distanceToPivot = RoundToNearestGrid(tempMax.transform.position.y) - RoundToNearestGrid(newPosition.y);
+                newPosition.y = gridHeight - distanceToPivot - 5;
+
+            }
+
+            //snaps the y position along the close edge of the grid
+            else if (minBounds.y == 1)
+            {
+                GameObject tempMin = furthestCenterMin(1);
+                float distanceToPivot = RoundToNearestGrid(newPosition.y) - RoundToNearestGrid(tempMin.transform.position.y);
+                newPosition.y = offset.y + distanceToPivot + 5;
+            }
+
+            //snaps the z position along the far edge of the grid
+            if (maxBounds.z == 1)
+            {
+                GameObject tempMax = furthestCenterMax(2);
+                float distanceToPivot = RoundToNearestGrid(tempMax.transform.position.z) - RoundToNearestGrid(newPosition.z);
+                newPosition.z = gridLength - distanceToPivot - 5;
+
+            }
+
+            //snaps the z position along the close edge of the grid
+            else if (minBounds.z == 1)
+            {
+                GameObject tempMin = furthestCenterMin(2);
+                float distanceToPivot = RoundToNearestGrid(newPosition.z) - RoundToNearestGrid(tempMin.transform.position.z);
+                newPosition.z = offset.z + distanceToPivot + 5;
             }
         }
 
-        return new Vector3(x, newPosition.y, newPosition.z);
-    }
+        //Loops through all the blocks and sees if the new position is currently occupied 
+        for(int i = 0; i < blocks.Count; i++)
+        {
+            Vector3 distanceFromPivot = blocks[blocks.Count - 1].position - blocks[i].position; //calulates the relative position this block is to the pivot point
 
-    Vector3 gridEdgeSnapping()
-    {
-        /*
-          * PSEUDOCODE for Grid Edge Snapping
-          * 1. Get the objects position as the player moves the object
-          * 2. Once dragging stops, check if the object was dropped out of bounds
-          * 3. If no, check if the space is occupied
-          *        3.1 if no, drop the object here
-          *        3.2 if yes, snap to the origial location
-          * 4. If yes, check which part of the object is out of bounds
-          *        4.1 Once the problem edges are found, find the centers furthest from those edges
-          *        4.2 Find new position so those centers line up with the edges of the grid and is inside
-          *        4.3 Check if the space is occupied
-          *        4.4 If this position is currently occupied by another object, snap to the position it was picked up from
-          *        4.5 If not currently occupied, drop the object in the new position  
-          */
+            Vector3 index = new Vector3(
+                Mathf.Round((newPosition.x - distanceFromPivot.x) / cellSize - 1), 
+                Mathf.Round((newPosition.y - distanceFromPivot.y) / cellSize - 1), 
+                Mathf.Round((newPosition.z - distanceFromPivot.z) / cellSize - 1)); //calulates the index for the position of this block to check if it is occupied 
 
-        //1
-        Vector3 newPosition = targetPos;
+            //using the index, check if this space is occupied 
+            if (gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == true)
+            {
+                newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the position it was moved from
 
-        //2
-
-
+            }
+        }
 
         return newPosition;
     }
 
-    float maxLocationValue(float value, float min, float max)
-    {
-        float newValue;
-
-        //Checks X boundaries
-        if (value >= max)
-        {
-            newValue = RoundToNearestGrid(gridWidth);
-        }
-
-        else if (value <= min)
-        {
-            newValue = RoundToNearestGrid(offset.x);
-        }
-
-        else
-        {
-            newValue = RoundToNearestGrid(value);
-        }
-
-        return newValue;
-    }
-
+    //finds the block furthest to the far edge
     GameObject furthestCenterMax(int axis)
     {
-        Transform furthest = null;
+        Transform furthest = null; //stores the furthest block
 
+        //loops for every block in the item
         for(int i = 0; i < blocks.Count; i++) 
-        {
+        {   
+            //first block is set as the furthest and is then check amongst the other blocks
             if(i == 0)
             {
                 furthest = blocks[i];
             }
 
+            //checks the furthest block from the far x bounds
             else if(axis == 0)
             {
                 if (furthest.position.x < blocks[i].position.x)
@@ -319,6 +306,7 @@ public class DragDrop : MonoBehaviour
                 }
             }
 
+            //checks the furthest block from far y bounds
             else if (axis == 1)
             {
                 if (furthest.position.y < blocks[i].position.y)
@@ -327,30 +315,34 @@ public class DragDrop : MonoBehaviour
                 }
             }
 
-            else if(axis == 2)
+            //checks the furthest block from far z bounds
+            else if (axis == 2)
             {
                 if (furthest.position.z < blocks[i].position.z)
                 {
                     furthest = blocks[i];
                 }
-            }
-            
+            }        
         }
 
         return furthest.gameObject;
     }
 
+    //finds the block furthest to the close edge
     GameObject furthestCenterMin(float axis)
     {
-        Transform furthest = null;
+        Transform furthest = null; //stores the furthest block
 
+        //runs for every block in the item
         for (int i = 0; i < blocks.Count; i++)
         {
+            //first block is set as the furthest and is then check amongst the other blocks
             if (i == 0)
             {
                 furthest = blocks[i];
             }
 
+            //checks the furthest block from close x bounds
             else if (axis == 0)
             {
                 if (furthest.position.x > blocks[i].position.x)
@@ -359,6 +351,7 @@ public class DragDrop : MonoBehaviour
                 }
             }
 
+            //checks the furthest block from close y bounds
             else if (axis == 1)
             {
                 if (furthest.position.y > blocks[i].position.y)
@@ -367,6 +360,7 @@ public class DragDrop : MonoBehaviour
                 }
             }
 
+            //checks the furthest block from close z bounds
             else if (axis == 2)
             {
                 if (furthest.position.z > blocks[i].position.z)
