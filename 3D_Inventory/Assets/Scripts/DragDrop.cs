@@ -1,4 +1,4 @@
-using System.Collections;
+ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -221,30 +221,33 @@ public class DragDrop : MonoBehaviour
             }
         }
 
-        if(outOfBounds)
+        float x = newPosition.x;
+
+        if (outOfBounds)
         {
             Debug.Log(maxBounds.x + " " + maxBounds.y + " " + maxBounds.z);
-            Debug.Log(minBounds.x + " " + minBounds.y + " " + minBounds.z);
-
-            float x = 0;
+            Debug.Log(minBounds.x + " " + minBounds.y + " " + minBounds.z);           
 
             if(maxBounds.x == 1)
             {
-                x = RoundToNearestGrid(furthestCenterMax(0).transform.position.x);
+                GameObject tempMax = furthestCenterMax(0);
+                float tempX1 = RoundToNearestGrid(newPosition.x) - RoundToNearestGrid(tempMax.transform.position.x);
+                x = gridWidth - RoundToNearestGrid(newPosition.x) + RoundToNearestGrid(tempMax.transform.position.x) - 5;
                 Debug.Log(x);
+
             }
 
             else if(minBounds.x == 1)
             {
-                x = RoundToNearestGrid(furthestCenterMin(0).transform.position.x);
+                GameObject tempMin = furthestCenterMin(0);
+                float tempX1 = RoundToNearestGrid(tempMin.transform.position.x);
+                float tempX2 = RoundToNearestGrid(newPosition.x);
+                x = offset.x + 5; 
                 Debug.Log(x);
             }
-
-            float newX = offset.x - x;
-
         }
 
-        return newPosition;
+        return new Vector3(x, newPosition.y, newPosition.z);
     }
 
     Vector3 gridEdgeSnapping()
