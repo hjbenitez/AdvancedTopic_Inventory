@@ -1,10 +1,17 @@
- using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class DragDrop : MonoBehaviour
 {
     public Vector3[] centers; //array for all the centers of the object (every 1x1 it is composed of)
+
+    public Sprite inventoryIcon;
+    public Controller controller;
+    public MeshRenderer mesh;
+    bool overUI;
 
     public GridManager gridManager; //the grid manager game object, set in the Inspector
     public int numberOfCenters; //essentially tells the object how many 1x1s are inside of it (set in the Inspector)
@@ -47,10 +54,15 @@ public class DragDrop : MonoBehaviour
         gridHeight = height * cellSize + offset.y;
         gridLength = length * cellSize + offset.z;
 
+        overUI = false;
+
         //for each block that is inside the item, add it to the list of blocks
         foreach (Transform child in this.gameObject.transform)
         {
-            blocks.Add(child);
+            if (child.tag == "Collider")
+            {
+                blocks.Add(child);
+            }
         }
     }
 
@@ -65,6 +77,32 @@ public class DragDrop : MonoBehaviour
             //Debug - Shows lines from the centers to the origin
             //Debug.DrawLine(offset, centers[i], Color.red);
         }
+
+        if (dragging)
+        {
+            overUI = controller.IsPointerOverUIElement();
+            Debug.Log(overUI);
+
+            if (overUI)
+            {
+                mesh.enabled = false;
+                controller.hand1.sprite = inventoryIcon;
+            }
+
+            else
+            {
+                mesh.enabled = true;
+                controller.hand1.sprite = null;
+            }
+
+
+            dragging = true;
+
+            //weird set of calculations that ensures that the screen position and the world position are 1:1 when dragging
+            float distanceToScreen = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
+            targetPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distanceToScreen));
+            transform.position = targetPos;
+        }
     }
     //updates the last position to the location the item was picked up AND the last rotation of the item
     private void OnMouseDown()
@@ -75,51 +113,32 @@ public class DragDrop : MonoBehaviour
             lastPositions[i] = new Vector3(RoundToNearestGrid(centers[i].x), RoundToNearestGrid(centers[i].y), RoundToNearestGrid(centers[i].z));
             lastRotation = transform.eulerAngles;
         }
+
+        dragging = true;
     }
 
     //runs when the item is being dragged
     private void OnMouseDrag()
     {
-        //rotates the item when a specific key is pressed
-        //WS - UP/DOWN
-        //AD - RIGHT/LEFT
 
-        /*
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            transform.eulerAngles += new Vector3(0, 90, 0);
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            transform.eulerAngles += new Vector3(0, -90, 0);
-        }
-        
-         * 
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            transform.localEulerAngles += new Vector3(-90, 0, 0);
-        }
-
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            transform.localEulerAngles += new Vector3(90, 0, 0);
-        }
-        */
-
-        dragging = true;
-
-        //weird set of calculations that ensures that the screen position and the world position are 1:1 when dragging
-        float distanceToScreen = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-        targetPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distanceToScreen));
-        transform.position = targetPos;
     }
 
     //checks boundaries when dropped
     private void OnMouseUp()
     {
         dragging = false;
-        transform.position = checkBoundaries();
+
+        if (!overUI)
+        {
+            transform.position = checkBoundaries();
+        }
+
+        if (overUI)
+        {
+            controller.store(this.gameObject);
+            transform.gameObject.SetActive(false);
+            controller.droppedItem(true);
+        }
     }
 
     //rounds to the nearest grid cell
@@ -162,7 +181,7 @@ public class DragDrop : MonoBehaviour
             {
                 //Check which side the object was dropped out of bounds
                 //checks the far x bounds
-                if(centers[i].x > gridWidth)
+                if (centers[i].x > gridWidth)
                 {
                     maxBounds.x = 1;
                 }
@@ -199,9 +218,9 @@ public class DragDrop : MonoBehaviour
 
                 outOfBounds = true; //the item was dropped out of bounds
             }
-            
+
             //checks if it was dropped overlapping another item
-            else if(gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == true && !outOfBounds)
+            else if (gridManager.inventorySpace[(int)index.x, (int)index.y, (int)index.z] == true && !outOfBounds)
             {
                 newPosition = lastPositions[lastPositions.Length - 1]; //sets the position to the position it was moved from
             }
@@ -263,13 +282,13 @@ public class DragDrop : MonoBehaviour
         }
 
         //Loops through all the blocks and sees if the new position is currently occupied 
-        for(int i = 0; i < blocks.Count; i++)
+        for (int i = 0; i < blocks.Count; i++)
         {
             Vector3 distanceFromPivot = blocks[blocks.Count - 1].position - blocks[i].position; //calulates the relative position this block is to the pivot point
 
             Vector3 index = new Vector3(
-                Mathf.Round((newPosition.x - distanceFromPivot.x) / cellSize - 1), 
-                Mathf.Round((newPosition.y - distanceFromPivot.y) / cellSize - 1), 
+                Mathf.Round((newPosition.x - distanceFromPivot.x) / cellSize - 1),
+                Mathf.Round((newPosition.y - distanceFromPivot.y) / cellSize - 1),
                 Mathf.Round((newPosition.z - distanceFromPivot.z) / cellSize - 1)); //calulates the index for the position of this block to check if it is occupied 
 
             //using the index, check if this space is occupied 
@@ -289,16 +308,16 @@ public class DragDrop : MonoBehaviour
         Transform furthest = null; //stores the furthest block
 
         //loops for every block in the item
-        for(int i = 0; i < blocks.Count; i++) 
-        {   
+        for (int i = 0; i < blocks.Count; i++)
+        {
             //first block is set as the furthest and is then check amongst the other blocks
-            if(i == 0)
+            if (i == 0)
             {
                 furthest = blocks[i];
             }
 
             //checks the furthest block from the far x bounds
-            else if(axis == 0)
+            else if (axis == 0)
             {
                 if (furthest.position.x < blocks[i].position.x)
                 {
@@ -322,7 +341,7 @@ public class DragDrop : MonoBehaviour
                 {
                     furthest = blocks[i];
                 }
-            }        
+            }
         }
 
         return furthest.gameObject;
@@ -371,5 +390,10 @@ public class DragDrop : MonoBehaviour
         }
 
         return furthest.gameObject;
+    }
+
+    public Sprite getInventoryIcon()
+    {
+        return inventoryIcon;
     }
 }

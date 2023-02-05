@@ -29,19 +29,24 @@ public class CameraRotate : MonoBehaviour
     float elevationMin;
     float elevationMax;
 
+    bool initialize;
+
     // Start is called before the first frame update
     void Start()
     {
         //setting the min and maxes
-        elevationMin = elevationOffset - 30; 
+        elevationMin = elevationOffset - 30;
         elevationMax = elevationOffset + 30;
+
+        rotating = true;
+        initialize = false;
     }
 
     // Update is called once per frame
     void Update()
     {
         //starts rotating on the right button down
-        if(Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1))
         {
             rotating = true;
         }
@@ -53,7 +58,7 @@ public class CameraRotate : MonoBehaviour
         }
 
         //checks if the elevation changes past the min and maxes
-        if(elevationOffset < elevationMin)
+        if (elevationOffset < elevationMin)
         {
             elevationOffset = elevationMin;
         }
@@ -70,25 +75,30 @@ public class CameraRotate : MonoBehaviour
         //when the right mouse button is held down
         if (rotating)
         {
-            
             float horizontalDirection = Input.GetAxis("Mouse X"); //gets the mouse horizontal value between -1 and 1
             float verticalDirection = Input.GetAxis("Mouse Y"); //gets the mouse vertical value between -1 and 1
 
             //calculate the angle to use for the next few math caluclations
             //positive and negative horizontalDirection value to change direction
-            angleX += Time.deltaTime * sensitivityX * -horizontalDirection; 
+            angleX += Time.deltaTime * sensitivityX * -horizontalDirection;
 
             //sets the horizontal position 
             horizontalPosition.Set(
                 Mathf.Cos(angleX) * radius,
                 elevationOffset,
-                Mathf.Sin(angleX) * radius    
+                Mathf.Sin(angleX) * radius
             );
 
             elevationOffset += (sensitivityY * -verticalDirection); //changes the elevation height based on mouse movement 
 
             transform.position = backpack + horizontalPosition; //sets the position of the camera 
             transform.LookAt(backpack); //looks at the inventory
+        }
+
+        if(!initialize)
+        {
+            rotating = false;
+            initialize = true;
         }
     }
 }

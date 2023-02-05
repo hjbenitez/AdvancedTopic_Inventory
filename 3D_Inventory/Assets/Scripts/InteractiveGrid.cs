@@ -39,7 +39,7 @@ public class InteractiveGrid
             {
                 for (int z = 0; z < gridArray.GetLength(2); z++)
                 {
-                    //debugTextArray[x, y, z] = CreateWorldText(null, inventorySpace[x, y, z].ToString(), getWorldPosition(x, y, z) + new Vector3(cellSize, cellSize) * 0.5f, 20, Color.blue, TextAnchor.MiddleCenter);
+                    debugTextArray[x, y, z] = CreateWorldText(null, inventorySpace[x, y, z].ToString(), getWorldPosition(x, y, z) + new Vector3(cellSize, cellSize) * 0.5f, 20, Color.blue, TextAnchor.MiddleCenter);
                 }
 
             }

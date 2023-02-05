@@ -31,6 +31,8 @@ public class GridManager : MonoBehaviour
 
     private void Update()
     {
+        items = GameObject.FindGameObjectsWithTag("Item");
+
         //runs for every item in the inventory system
         foreach (GameObject item in items)
         {
@@ -53,7 +55,7 @@ public class GridManager : MonoBehaviour
                     inventorySpace[(int)spacePos.x, (int)spacePos.y, (int)spacePos.z] = true;
 
                     //DEBUG --- Visual Aid
-                    //grid.setValue((int)spacePos.x, (int)spacePos.y, (int)spacePos.z, true);
+                    grid.setValue((int)spacePos.x, (int)spacePos.y, (int)spacePos.z, true);
                 }
                 spaceOccupied = true;
             }
@@ -66,7 +68,7 @@ public class GridManager : MonoBehaviour
                 {
                     Vector3 lp = new Vector3(Mathf.Round((lastPosition.x / cellSize) - 1), Mathf.Round((lastPosition.y / cellSize) - 1), Mathf.Round((lastPosition.z / cellSize) - 1));
                     inventorySpace[(int)lp.x, (int)lp.y, (int)lp.z] = false;
-                    //grid.setValue((int)lp.x, (int)lp.y, (int)lp.z, false);
+                    grid.setValue((int)lp.x, (int)lp.y, (int)lp.z, false);
                 }
             }
         }
