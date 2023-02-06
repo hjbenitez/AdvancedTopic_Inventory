@@ -40,9 +40,12 @@ public class Slot : MonoBehaviour
 
             else if (Input.GetMouseButtonUp(0))
             {
-                temp.GetComponent<DragDrop>().mouseUp = true;
-                dropped = false;
-                temp = null;
+                if (temp != null)
+                {
+                    temp.GetComponent<DragDrop>().mouseUp = true;
+                    dropped = false;
+                    temp = null;
+                }
                 dragging = false;
             }
         }

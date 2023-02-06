@@ -134,7 +134,7 @@ public class DragDrop : MonoBehaviour
             //weird set of calculations that ensures that the screen position and the world position are 1:1 when dragging
             float distanceToScreen = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
             targetPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distanceToScreen));
-            transform.position = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
+            transform.position = targetPos;
         }
     }
 
