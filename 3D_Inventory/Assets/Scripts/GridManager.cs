@@ -61,7 +61,7 @@ public class GridManager : MonoBehaviour
             }
 
             //checks if the item is moving
-            if (item.GetComponent<DragDrop>().dragging == true)
+            if (item.GetComponent<DragDrop>().dragging)
             {
                 //using all the last positions of each center, tell the game that their last position space is unoccupied now
                 foreach(Vector3 lastPosition in lastPositions)

@@ -53,7 +53,7 @@ public class Controller : MonoBehaviour
 
     public void store(GameObject item)
     {
-        hand1.GetComponent<Slot>().item = item;
+        hand1.GetComponent<Slot>().item = item.name;
     }
 
     public void droppedItem(bool dropped)

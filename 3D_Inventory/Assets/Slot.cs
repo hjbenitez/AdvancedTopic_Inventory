@@ -5,11 +5,13 @@ using UnityEngine;
 public class Slot : MonoBehaviour
 {
     public int slotID = 1;
-    public GameObject item;
+    public string item;
     public Controller controller;
     public bool dropped;
-
     public bool dragging = false;
+    GameObject temp;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,23 +21,28 @@ public class Slot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(dropped)
+        if (dropped)
         {
-            if(controller.IsPointerOverUIElement() && dragging && item != null)
+            if (controller.IsPointerOverUIElement() && dragging && item != null)
             {
-                item.SetActive(true);
-                item.GetComponent<DragDrop>().dragging = true;
+                temp = Instantiate(Resources.Load(item, typeof(GameObject)) as GameObject);
+                temp.name = item;
+                temp.GetComponent<DragDrop>().dragging = true;
+
                 item = null;
-                dropped = false;
+                dragging = false;
             }
 
-            if(Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0))
             {
                 dragging = true;
             }
 
             else if (Input.GetMouseButtonUp(0))
             {
+                temp.GetComponent<DragDrop>().mouseUp = true;
+                dropped = false;
+                temp = null;
                 dragging = false;
             }
         }

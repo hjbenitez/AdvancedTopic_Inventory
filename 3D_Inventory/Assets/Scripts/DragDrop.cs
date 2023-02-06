@@ -11,7 +11,12 @@ public class DragDrop : MonoBehaviour
     public Sprite inventoryIcon;
     public Controller controller;
     public MeshRenderer mesh;
-    bool overUI;
+    public bool overUI;
+    public bool equipped;
+    public bool instantiated;
+
+    public bool mouseDown;
+    public bool mouseUp;
 
     public GridManager gridManager; //the grid manager game object, set in the Inspector
     public int numberOfCenters; //essentially tells the object how many 1x1s are inside of it (set in the Inspector)
@@ -37,6 +42,22 @@ public class DragDrop : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gridManager = GameObject.FindGameObjectWithTag("GridManager").GetComponent<GridManager>();
+        controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Controller>();
+        mesh = GetComponentInChildren<MeshRenderer>();
+
+        //for each block that is inside the item, add it to the list of blocks
+        foreach (Transform child in this.gameObject.transform)
+        {
+            if (child.tag == "Collider")
+            {
+                blocks.Add(child);
+
+            }
+        }
+
+        numberOfCenters = blocks.Count;
+
         //grabs values from the grid created
         width = gridManager.width;
         height = gridManager.height;
@@ -55,20 +76,15 @@ public class DragDrop : MonoBehaviour
         gridLength = length * cellSize + offset.z;
 
         overUI = false;
-
-        //for each block that is inside the item, add it to the list of blocks
-        foreach (Transform child in this.gameObject.transform)
-        {
-            if (child.tag == "Collider")
-            {
-                blocks.Add(child);
-            }
-        }
+        instantiated = false;
+        mouseDown = false;
+        mouseUp = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        overUI = controller.IsPointerOverUIElement();
         //updates all the centers of the item
         for (int i = 0; i < centers.Length; i++)
         {
@@ -78,36 +94,54 @@ public class DragDrop : MonoBehaviour
             //Debug.DrawLine(offset, centers[i], Color.red);
         }
 
-        if (dragging)
+        //OnMouseDown() ------------------------
+        if (mouseDown)
         {
-            overUI = controller.IsPointerOverUIElement();
-            Debug.Log(overUI);
-
-            if (overUI)
+            mouseDown = false;
+            //loops for e
+            for (int i = 0; i < centers.Length; i++)
             {
-                mesh.enabled = false;
-                controller.hand1.sprite = inventoryIcon;
+                lastPositions[i] = new Vector3(RoundToNearestGrid(centers[i].x), RoundToNearestGrid(centers[i].y), RoundToNearestGrid(centers[i].z));
+                lastRotation = transform.eulerAngles;
+            }
+            dragging = true;
+        }
+
+        //OnMouseUp() -------------------------
+        else if (mouseUp)
+        {
+            mouseUp = false;
+            dragging = false;
+
+            if (!overUI)
+            {
+                transform.position = checkBoundaries();
+
             }
 
             else
             {
-                mesh.enabled = true;
-                controller.hand1.sprite = null;
+                controller.store(this.gameObject);
+                controller.droppedItem(true);
+                Destroy(this.gameObject);
             }
 
+        }
 
-            dragging = true;
-
+        //OnMouseDrag() ----------------------------
+        if (dragging)
+        {
             //weird set of calculations that ensures that the screen position and the world position are 1:1 when dragging
             float distanceToScreen = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
             targetPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distanceToScreen));
-            transform.position = targetPos;
+            transform.position = new Vector3(RoundToNearestGrid(targetPos.x), RoundToNearestGrid(targetPos.y), RoundToNearestGrid(targetPos.z));
         }
     }
+
     //updates the last position to the location the item was picked up AND the last rotation of the item
     private void OnMouseDown()
     {
-        //loops for e
+        /*/loops for e
         for (int i = 0; i < centers.Length; i++)
         {
             lastPositions[i] = new Vector3(RoundToNearestGrid(centers[i].x), RoundToNearestGrid(centers[i].y), RoundToNearestGrid(centers[i].z));
@@ -115,30 +149,17 @@ public class DragDrop : MonoBehaviour
         }
 
         dragging = true;
+        */
+        mouseDown = true;
     }
 
-    //runs when the item is being dragged
-    private void OnMouseDrag()
-    {
-
-    }
 
     //checks boundaries when dropped
     private void OnMouseUp()
     {
-        dragging = false;
-
-        if (!overUI)
-        {
-            transform.position = checkBoundaries();
-        }
-
-        if (overUI)
-        {
-            controller.store(this.gameObject);
-            transform.gameObject.SetActive(false);
-            controller.droppedItem(true);
-        }
+        //dragging = false;
+        //transform.position = checkBoundaries();
+        mouseUp = true;
     }
 
     //rounds to the nearest grid cell
@@ -396,4 +417,5 @@ public class DragDrop : MonoBehaviour
     {
         return inventoryIcon;
     }
+
 }
